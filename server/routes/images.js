@@ -1,12 +1,11 @@
 const express = require('express');
-const { 
+const {
     getImages,
     getImage,
     uploadImage,
     updateImage,
     deleteImage,
     searchImages,
-    getImagesByFolder
 } = require('../controllers/images');
 
 const router = express.Router();
@@ -24,8 +23,5 @@ router.route('/:id')
     .get(protect, getImage)
     .put(protect, updateImage)
     .delete(protect, deleteImage);
-
-router.route('/folders/:folderId/images')
-    .get(protect, getImagesByFolder);
 
 module.exports = router;
