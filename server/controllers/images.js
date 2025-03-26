@@ -10,21 +10,21 @@ const fs = require('fs');
 exports.getImages = async (req, res, next) => {
     try {
         let query;
+        const recentLimit = 8; // How many recent images to show on home page
 
-        if (req.params.folderId) {
-            query = Image.find({ 
-                folder: req.params.folderId,
-                user: req.user.id 
-            });
-        } else {
-            query = Image.find({ user: req.user.id });
-        }
+        // Note: The route GET /api/v1/folders/:folderId/images is likely handled by folders router now.
+        // This controller function might now primarily serve GET /api/v1/images
+
+        // If fetching general images (likely for the home page or an 'all images' view)
+        query = Image.find({ user: req.user.id })
+                     .sort({ createdAt: -1 }) // Sort by newest first
+                     .limit(recentLimit);     // Limit to the N most recent
 
         const images = await query;
 
         res.status(200).json({
             success: true,
-            count: images.length,
+            count: images.length, // This will be max 'recentLimit'
             data: images
         });
     } catch (err) {
@@ -195,7 +195,7 @@ exports.getImagesByFolder = async (req, res, next) => {
         const images = await Image.find({
             folder: req.params.folderId,
             user: req.user.id
-        });
+        }).sort({ createdAt: -1 }); // Also good to sort here
 
         res.status(200).json({
             success: true,
