@@ -30,7 +30,7 @@ const Images = () => {
                 // Fetch folder details IF a folderId is present
                 if (folderId) {
                     const folderResponse = await axios.get(
-                        `http://localhost:5000/api/v1/folders/${folderId}`,
+                        `https://imagevault-cey2.onrender.com/api/v1/folders/${folderId}`,
                         { headers: { Authorization: `Bearer ${authTokens.token}` } }
                     );
                     setFolder(folderResponse.data.data);
@@ -39,8 +39,8 @@ const Images = () => {
                 // Fetch images for the specific folder OR all images if no folderId
                 // Use the correct endpoints based on your routing setup
                 const imagesUrl = folderId
-                    ? `http://localhost:5000/api/v1/folders/${folderId}/images` // Endpoint for images within a folder
-                    : `http://localhost:5000/api/v1/images`; // Endpoint for recent/all images (if you want to show all here)
+                    ? `https://imagevault-cey2.onrender.com/api/v1/folders/${folderId}/images` // Endpoint for images within a folder
+                    : `https://imagevault-cey2.onrender.com/api/v1/images`; // Endpoint for recent/all images (if you want to show all here)
 
                  // If you ONLY want this page for specific folders, redirect if no folderId
                  if (!folderId) {

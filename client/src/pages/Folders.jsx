@@ -26,7 +26,7 @@ const Folders = () => {
             setLoading(true);
             setError('');
             try {
-                const response = await axios.get('http://localhost:5000/api/v1/folders', {
+                const response = await axios.get('https://imagevault-cey2.onrender.com/api/v1/folders', {
                     headers: {
                         Authorization: `Bearer ${authTokens?.token}`
                     }
@@ -52,7 +52,7 @@ const Folders = () => {
         setCreateError('');
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/v1/folders',
+                'https://imagevault-cey2.onrender.com/api/v1/folders',
                 {
                     name: newFolderName.trim(),
                     // Send null if parentFolder is empty string, otherwise send the ID

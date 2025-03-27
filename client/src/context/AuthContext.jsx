@@ -30,7 +30,7 @@ const AuthProvider = ({ children }) => {
 
     const loginUser = async (email, password) => {
         // Note: No try...catch here. Let the error propagate to the calling component.
-        const response = await axios.post('http://localhost:5000/api/v1/auth/login', {
+        const response = await axios.post('https://imagevault-cey2.onrender.com/api/v1/auth/login', {
             email,
             password
         });
@@ -62,7 +62,7 @@ const AuthProvider = ({ children }) => {
 
      const registerUser = async (name, email, password) => {
         // Note: No try...catch here. Let the error propagate.
-        const response = await axios.post('http://localhost:5000/api/v1/auth/register', {
+        const response = await axios.post('https://imagevault-cey2.onrender.com/api/v1/auth/register', {
             name,
             email,
             password

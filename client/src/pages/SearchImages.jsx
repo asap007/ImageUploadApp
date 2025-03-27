@@ -24,7 +24,7 @@ const SearchImages = () => {
 
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/v1/images/search?q=${encodeURIComponent(query)}`, // Ensure query is URL encoded
+                `https://imagevault-cey2.onrender.com/api/v1/images/search?q=${encodeURIComponent(query)}`, // Ensure query is URL encoded
                 {
                     headers: { Authorization: `Bearer ${authTokens?.token}` }
                 }

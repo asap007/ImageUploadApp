@@ -25,7 +25,7 @@ const UploadImage = () => {
              }
             setLoadingFolders(true);
             try {
-                const response = await axios.get('http://localhost:5000/api/v1/folders', {
+                const response = await axios.get('https://imagevault-cey2.onrender.com/api/v1/folders', {
                     headers: { Authorization: `Bearer ${authTokens?.token}` }
                 });
                 setFolders(response.data.data.sort((a,b) => a.name.localeCompare(b.name)));
@@ -91,7 +91,7 @@ const UploadImage = () => {
         }
 
         try {
-            await axios.post('http://localhost:5000/api/v1/images', formData, {
+            await axios.post('https://imagevault-cey2.onrender.com/api/v1/images', formData, {
                 headers: {
                     Authorization: `Bearer ${authTokens?.token}`,
                     'Content-Type': 'multipart/form-data'

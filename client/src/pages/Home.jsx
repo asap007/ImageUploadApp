@@ -20,7 +20,7 @@ const Home = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get('http://localhost:5000/api/v1/images', {
+                const response = await axios.get('https://imagevault-cey2.onrender.com/api/v1/images', {
                     headers: {
                         Authorization: `Bearer ${authTokens.token}`
                     }
