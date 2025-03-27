@@ -25,7 +25,7 @@ const app = express();
 
 // Enable CORS
 app.use(cors({
-    origin: 'https://image-vault-ten.vercel.app/', // Keep your frontend origin
+    origin: 'https://image-vault-ten.vercel.app', // Keep your frontend origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
