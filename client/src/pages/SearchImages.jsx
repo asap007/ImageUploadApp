@@ -92,7 +92,7 @@ const SearchImages = () => {
                                     <div key={image._id} className="bg-white rounded-lg shadow-md overflow-hidden group transition duration-300 hover:shadow-xl">
                                         <div className="relative w-full h-48">
                                             <img
-                                                src={`http://localhost:5000${image.url}`}
+                                                src={image.url}
                                                 alt={image.name}
                                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                                 loading="lazy"
@@ -116,7 +116,7 @@ const SearchImages = () => {
                                             )}
                                             {!image.folder && (
                                                  <p className="text-xs text-gray-500 mt-1">
-                                                    (No folder)
+                                                    (Root Folder)
                                                  </p>
                                             )}
                                         </div>

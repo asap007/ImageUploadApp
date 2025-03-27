@@ -1,7 +1,7 @@
 const Image = require('../models/Image');
+const Folder = require('../models/Folder'); // Needed potentially for folder validation
 const ErrorResponse = require('../utils/errorResponse');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2
 
 // @desc    Get all images
 // @route   GET /api/v1/images
@@ -64,34 +64,57 @@ exports.uploadImage = async (req, res, next) => {
         }
 
         const file = req.files.file;
-        const uploadPath = path.join(__dirname, '../uploads');
+        const userId = req.user.id;
+        const folderId = req.body.folder || null;
+        const imageName = req.body.name || file.name; // Use provided name or file name
 
-        // Create uploads directory if it doesn't exist
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
+        // Optional: Validate file type if needed (Cloudinary often handles this)
+        // if (!file.mimetype.startsWith('image')) {
+        //     return next(new ErrorResponse('Please upload an image file', 400));
+        // }
+
+        // Optional: Validate folder exists if folderId is provided
+        if (folderId) {
+            const folderExists = await Folder.findOne({ _id: folderId, user: userId });
+            if (!folderExists) {
+                return next(new ErrorResponse(`Folder not found with id ${folderId}`, 404));
+            }
         }
 
-        // Generate unique filename
-        const filename = `image_${Date.now()}${path.extname(file.name)}`;
-        const filePath = path.join(uploadPath, filename);
+        // ---> Upload to Cloudinary <---
+        console.log(`Uploading file: ${file.name} to Cloudinary...`);
+        const result = await cloudinary.uploader.upload(file.tempFilePath, { // Use tempFilePath from express-fileupload
+            folder: `imagevault/${userId}`, // Organize by user ID in Cloudinary (optional)
+            // public_id: `some_unique_name`, // Optional: Let Cloudinary generate
+            resource_type: "auto", // Detect image, video, etc.
+            // You can add tags, context, transformations here if needed
+        });
+        console.log('Cloudinary upload successful:', result.secure_url);
 
-        await file.mv(filePath);
-
+        // ---> Create Database Record <---
         const image = await Image.create({
-            name: req.body.name || path.parse(file.name).name,
-            url: `/uploads/${filename}`,
-            folder: req.body.folder || null,
-            user: req.user.id
+            name: imageName,
+            url: result.secure_url, // Store the Cloudinary URL
+            cloudinaryPublicId: result.public_id, // Store the public_id for deletion
+            folder: folderId,
+            user: userId
         });
 
         res.status(200).json({
             success: true,
             data: image
         });
+
     } catch (err) {
         console.error('Upload error:', err);
-        next(new ErrorResponse('File upload failed', 500));
+        // Provide more specific error if possible
+        if (err.http_code && err.message) {
+             next(new ErrorResponse(`Cloudinary Error: ${err.message}`, err.http_code));
+        } else {
+             next(new ErrorResponse('File upload failed', 500));
+        }
     }
+    // Note: express-fileupload should automatically clean up temp files
 };
 
 // @desc    Update image
@@ -148,21 +171,41 @@ exports.deleteImage = async (req, res, next) => {
             );
         }
 
-        // Delete file from uploads folder
-        if (fs.existsSync(`.${image.url}`)) {
-            fs.unlinkSync(`.${image.url}`);
+        // ---> Delete from Cloudinary <---
+        if (image.cloudinaryPublicId) {
+            console.log(`Deleting image from Cloudinary: ${image.cloudinaryPublicId}`);
+            try {
+                const deleteResult = await cloudinary.uploader.destroy(image.cloudinaryPublicId);
+                console.log('Cloudinary deletion result:', deleteResult);
+                 // Check result.result for 'ok' or 'not found'
+                if (deleteResult.result !== 'ok' && deleteResult.result !== 'not found') {
+                     // Log error but potentially continue to delete from DB anyway
+                     console.warn(`Cloudinary deletion failed or status unknown for ${image.cloudinaryPublicId}:`, deleteResult.result);
+                }
+            } catch (cloudinaryErr) {
+                console.error(`Error deleting image ${image.cloudinaryPublicId} from Cloudinary:`, cloudinaryErr);
+                // Decide if you want to stop the process or just log the error
+                // For robustness, we might continue to remove the DB record even if Cloudinary fails
+            }
+        } else {
+             console.warn(`Image ${image._id} missing cloudinaryPublicId, cannot delete from Cloudinary.`);
         }
 
-        await image.remove();
+
+        // ---> Delete from Database <---
+        await image.deleteOne(); // Use deleteOne() instead of remove()
 
         res.status(200).json({
             success: true,
-            data: {}
+            data: {} // Send empty object on successful deletion
         });
+
     } catch (err) {
-        next(err);
+         console.error('Error during image deletion process:', err);
+        next(err); // Pass to error handler
     }
 };
+
 
 // @desc    Search images
 // @route   GET /api/v1/images/search?q=query

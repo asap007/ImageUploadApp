@@ -1,3 +1,4 @@
+// server/models/Image.js
 const mongoose = require('mongoose');
 
 const imageSchema = new mongoose.Schema({
@@ -10,6 +11,9 @@ const imageSchema = new mongoose.Schema({
     url: {
         type: String,
         required: true
+    },
+    cloudinaryPublicId: {
+        type: String,
     },
     folder: {
         type: mongoose.Schema.Types.ObjectId,

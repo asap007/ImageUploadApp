@@ -1,3 +1,4 @@
+// server/app.js
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -6,32 +7,39 @@ const fileUpload = require('express-fileupload');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2; 
 
 // Load env vars
-dotenv.config({ path: './config/config.env' });
+dotenv.config();
+
+// ---> Configure Cloudinary <---
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true // Use https
+});
+console.log('Cloudinary configured.'); // Confirmation log
 
 const app = express();
 
 // Enable CORS
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173', // Keep your frontend origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
-// Handle file uploads
-app.use(fileUpload());
+// Handle file uploads (still needed to receive the file)
+app.use(fileUpload({
+    useTempFiles: true, // Use temporary files for Cloudinary upload (optional, can upload buffer too)
+    tempFileDir: '/tmp/' // Optional: specify temp dir if needed and permissions allow
+}));
 
 // Set body parser
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-
-const uploadsPath = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
-}
-app.use('/uploads', express.static(uploadsPath));
 
 // Import all routes
 const auth = require('./routes/auth');
