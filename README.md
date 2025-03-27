@@ -2,7 +2,11 @@
 
 ImageVault is a full-stack web application built with the MERN stack (MongoDB, Express, React, Node.js) that allows users to register, log in, upload images to Cloudinary, organize them into folders, and search for them.
 
-![Optional: Add a screenshot or GIF of your application here]
+![Screenshot_1](https://github.com/user-attachments/assets/0041839f-e15e-45e9-b844-bf039f61a0d5)
+![Screenshot_2](https://github.com/user-attachments/assets/9fc5559d-86f3-4edf-8dc0-d3efc1023e9a)
+![Screenshot_3](https://github.com/user-attachments/assets/bceac289-91fa-4873-a025-3728587522aa)
+![Screenshot_4](https://github.com/user-attachments/assets/d7eb8b63-7fa2-4e28-83af-da247de783da)
+
 
 ## Features
 
